@@ -1,0 +1,30 @@
+{
+  "name": "chrome-extension-socket-mcp",
+  "version": "1.0.0",
+  "module": "src/server.ts",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "build": "tsc",
+    "debug": "npx @modelcontextprotocol/inspector tsx examples/mcp.ts",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": ["chrome extension", "mcp", "model-context-protocol", "websocket", "mcp-server"],
+  "author": "oanakiaja",
+  "license": "MIT",
+  "description": "A ",
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "@types/ws": "^8.18.0",
+    "eslint": "^9.23.0",
+    "globals": "^16.0.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.28.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.8.0",
+    "ws": "^8.18.1",
+    "zod": "^3.24.2"
+  }
+}
