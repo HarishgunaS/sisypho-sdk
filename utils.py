@@ -190,7 +190,7 @@ def await_task_completion():
     input()
 
 class Workflow:
-    def __init__(self, api_key: str, recording: str, task_prompt: Optional[str] = None):
+    def __init__(self, api_key: str, recording: str, task_prompt: str):
         self.recording = recording
         self.task_prompt = task_prompt
         self.code = ""
