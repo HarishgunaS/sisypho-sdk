@@ -1,0 +1,16 @@
+{
+    "name": "Sisypho",
+    "description": "Sisypho Chrome Extension",
+    "version": "1.0",
+    "manifest_version": 3,
+    "permissions": ["scripting", "nativeMessaging", "tabs"],
+    "action": {
+        "default_popup": "hello.html",
+        "default_icon": "sisypho_logo.png",
+        "default_title": "Run Sisypho"
+    },
+    "background": {
+        "service_worker": "background.js"
+      },
+    "host_permissions": ["<all_urls>"]
+  }

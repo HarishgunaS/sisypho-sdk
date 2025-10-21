@@ -1,1 +1,14 @@
 **/.build/
+venv/
+build/
+dist/*.whl
+dist/*.tar.gz
+dist/*.zip
+dist/*.egg-info
+dist/*.egg
+dist/*.pyc
+dist/*.pyo
+dist/*.pyd
+dist/*.pyw
+dist/*.pyz
+dist/*.pywz

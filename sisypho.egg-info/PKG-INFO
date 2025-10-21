@@ -1,0 +1,53 @@
+Metadata-Version: 2.4
+Name: sisypho
+Version: 0.1.0
+Summary: An SDK for browser automation, workflow recording, and skill execution with MCP integration (macOS only)
+Home-page: https://github.com/HarishgunaS/sisypho-sdk
+Author: Harishguna S
+Author-email: your.email@example.com
+Project-URL: Bug Reports, https://github.com/HarishgunaS/sisypho-sdk/issues
+Project-URL: Source, https://github.com/HarishgunaS/sisypho-sdk
+Keywords: automation,browser,workflow,recording,MCP,skills,playwright
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Testing
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Operating System :: MacOS
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: playwright>=1.40.0
+Requires-Dist: openpyxl>=3.1.0
+Requires-Dist: pycryptodomex>=3.23.0
+Requires-Dist: pyotp>=2.0.0
+Requires-Dist: requests>=2.31.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Provides-Extra: full
+Requires-Dist: pillow>=10.0.0; extra == "full"
+Requires-Dist: numpy>=1.24.0; extra == "full"
+Requires-Dist: pandas>=2.0.0; extra == "full"
+Requires-Dist: requests>=2.31.0; extra == "full"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license-file
+Dynamic: project-url
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# sisypho-sdk

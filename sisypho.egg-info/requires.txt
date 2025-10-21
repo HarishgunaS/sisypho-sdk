@@ -1,0 +1,16 @@
+playwright>=1.40.0
+openpyxl>=3.1.0
+pycryptodomex>=3.23.0
+pyotp>=2.0.0
+requests>=2.31.0
+
+[dev]
+pytest>=7.0.0
+black>=23.0.0
+flake8>=6.0.0
+
+[full]
+pillow>=10.0.0
+numpy>=1.24.0
+pandas>=2.0.0
+requests>=2.31.0

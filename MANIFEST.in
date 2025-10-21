@@ -1,0 +1,56 @@
+include README.md
+include LICENSE
+include workflow.json
+
+# Include macOS server source files and build scripts
+recursive-include sisypho/integrations/macos/servers/Sources *.swift
+recursive-include sisypho/integrations/macos/servers/EventPollingApp/EventPollingApp *.swift *.entitlements *.xcassets
+include sisypho/integrations/macos/servers/Package.swift
+include sisypho/integrations/macos/servers/Package.resolved
+include sisypho/integrations/macos/servers/build.sh
+include sisypho/integrations/macos/servers/README.md
+include sisypho/integrations/macos/servers/EventPollingApp/Package.swift
+
+# Include Xcode project files (needed for building)
+recursive-include sisypho/integrations/macos/servers/EventPollingApp/EventPollingApp.xcodeproj *.pbxproj *.xcworkspacedata
+
+# Include only the final executables
+include sisypho/integrations/macos/servers/.build/arm64-apple-macosx/release/AccessibilityMCPServer
+include sisypho/integrations/macos/servers/.build/x86_64-apple-macosx/release/AccessibilityMCPServer
+include sisypho/integrations/macos/servers/.build/release/AccessibilityMCPServer
+include sisypho/integrations/macos/servers/EventPollingApp/.build/arm64-apple-macosx/release/event-polling-cli
+include sisypho/integrations/macos/servers/EventPollingApp/.build/x86_64-apple-macosx/release/event-polling-cli
+include sisypho/integrations/macos/servers/EventPollingApp/.build/release/event-polling-cli
+
+# Exclude ALL other build artifacts
+global-exclude *.build
+global-exclude *.dSYM
+global-exclude *.swiftmodule
+global-exclude *.swiftdoc
+global-exclude *.swiftsourceinfo
+global-exclude *.d
+global-exclude *.o
+global-exclude *.pcm
+global-exclude *.h
+global-exclude *.LinkFileList
+global-exclude *.yaml
+global-exclude .build/build.db
+global-exclude .build/workspace-state.json
+global-exclude .build/description.json
+global-exclude .build/plugin-tools-description.json
+global-exclude .build/**/master.swiftdeps
+global-exclude .build/**/output-file-map.json
+global-exclude .build/**/module.modulemap
+global-exclude .build/**/sources
+
+# Exclude compiled Python files and cache
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *$py.class
+
+# Exclude macOS specific files
+global-exclude .DS_Store
+
+# Exclude user-specific Xcode files
+prune sisypho/integrations/macos/servers/EventPollingApp/EventPollingApp.xcodeproj/xcuserdata
+prune sisypho/integrations/macos/servers/EventPollingApp/EventPollingApp.xcodeproj/project.xcworkspace/xcuserdata
