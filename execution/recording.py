@@ -439,8 +439,16 @@ def main():
         print(f"Using provided server paths: {server_paths}")
     else:
         # Default server paths if none provided
+        # Get accessibility server path dynamically
+        try:
+            from integrations.macos import get_accessibility_server_path
+            accessibility_server = str(get_accessibility_server_path())
+        except (ImportError, FileNotFoundError):
+            # Fallback to hardcoded path
+            accessibility_server = "integrations/macos/servers/.build/arm64-apple-macosx/release/AccessibilityMCPServer"
+        
         default_servers = [
-            "integrations/macos/servers/.build/arm64-apple-macosx/release/AccessibilityMCPServer",
+            accessibility_server,
             "integrations/chrome/chrome-extension-bridge-mcp/node_modules/.bin/tsx integrations/chrome/chrome-extension-bridge-mcp/examples/mcp.ts",
         ]
         server_paths = default_servers

@@ -11,11 +11,100 @@ from execution.recording import record_mode, MCPRecordManager
 from execution.skill import SkillExecutor
 import requests
 import json
+import subprocess
+import time
+import socket
+import os
+from pathlib import Path
+
+
+def is_port_in_use(port: int, host: str = 'localhost') -> bool:
+    """Check if a port is in use by attempting to connect to it."""
+    try:
+        response = requests.get(f'http://{host}:{port}/count', timeout=2)
+        return response.status_code == 200
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        return False
+
+
+def find_event_polling_binary() -> Optional[str]:
+    """Find the event-polling-cli binary path."""
+    try:
+        from integrations.macos import get_event_polling_cli_path
+        return str(get_event_polling_cli_path())
+    except (ImportError, FileNotFoundError) as e:
+        return None
+
+
+def start_event_polling_cli() -> Optional[subprocess.Popen]:
+    """Start the event-polling-cli binary if not already running."""
+    # Check if already running
+    if is_port_in_use(8080):
+        print("Event polling CLI is already running on port 8080")
+        return None
+    
+    # Find the binary
+    binary_path = find_event_polling_binary()
+    if not binary_path:
+        print("ERROR: event-polling-cli binary not found. Please build it first:")
+        print("  cd integrations/macos/servers/EventPollingApp")
+        print("  swift build --configuration release")
+        raise FileNotFoundError("event-polling-cli binary not found")
+    
+    print(f"Starting event-polling-cli from: {binary_path}")
+    
+    # Start the process
+    try:
+        process = subprocess.Popen(
+            [binary_path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            bufsize=1,
+            env=dict(os.environ, PARENT_PROCESS_ID=str(os.getpid()))
+        )
+        
+        # Wait a bit for the server to start
+        max_wait = 10  # seconds
+        wait_interval = 0.5
+        elapsed = 0
+        
+        while elapsed < max_wait:
+            if is_port_in_use(8080):
+                print("✓ Event polling CLI started successfully")
+                return process
+            time.sleep(wait_interval)
+            elapsed += wait_interval
+            
+            # Check if process died
+            if process.poll() is not None:
+                stdout, stderr = process.communicate()
+                print(f"ERROR: event-polling-cli process died during startup")
+                print(f"STDOUT: {stdout}")
+                print(f"STDERR: {stderr}")
+                raise RuntimeError("event-polling-cli failed to start")
+        
+        # Timeout waiting for server to respond
+        print("WARNING: event-polling-cli started but not responding on port 8080")
+        return process
+        
+    except Exception as e:
+        print(f"ERROR: Failed to start event-polling-cli: {e}")
+        raise
+
 
 class RecorderContext:
     def __init__(self):
+        # Get accessibility server path dynamically
+        try:
+            from integrations.macos import get_accessibility_server_path
+            accessibility_server = str(get_accessibility_server_path())
+        except (ImportError, FileNotFoundError):
+            # Fallback to hardcoded path for development
+            accessibility_server = "integrations/macos/servers/.build/arm64-apple-macosx/release/AccessibilityMCPServer"
+        
         self.default_servers = [
-            "integrations/macos/servers/.build/arm64-apple-macosx/release/AccessibilityMCPServer",
+            accessibility_server,
             "integrations/chrome/chrome-extension-bridge-mcp/node_modules/.bin/tsx integrations/chrome/chrome-extension-bridge-mcp/examples/mcp.ts",
         ]
         self.servers = self.default_servers
@@ -23,10 +112,19 @@ class RecorderContext:
         self.recording_thread = None
         self.stdout_capture = io.StringIO()
         self.stderr_capture = io.StringIO()
+        self.event_polling_process = None  # Store the event-polling-cli process
         
         # Save original stdout/stderr so main thread can still print
         self.original_stdout = sys.__stdout__
         self.original_stderr = sys.__stderr__
+        
+        # Start event-polling-cli before initializing MCP servers
+        print("Checking event-polling-cli status...")
+        try:
+            self.event_polling_process = start_event_polling_cli()
+        except Exception as e:
+            print(f"Failed to start event-polling-cli: {e}")
+            raise
         
         # Suppress output during initialization as well
         original_stdout = sys.stdout
@@ -154,6 +252,27 @@ class RecorderContext:
             
         self.manager.cleanup()
         
+        # Stop event-polling-cli if we started it
+        if self.event_polling_process is not None:
+            try:
+                sys.__stdout__.write("Stopping event-polling-cli...\n")
+                sys.__stdout__.flush()
+                self.event_polling_process.terminate()
+                # Wait for graceful shutdown
+                try:
+                    self.event_polling_process.wait(timeout=5.0)
+                    sys.__stdout__.write("✓ Event polling CLI stopped\n")
+                    sys.__stdout__.flush()
+                except subprocess.TimeoutExpired:
+                    # Force kill if it doesn't stop gracefully
+                    self.event_polling_process.kill()
+                    self.event_polling_process.wait()
+                    sys.__stdout__.write("✓ Event polling CLI force stopped\n")
+                    sys.__stdout__.flush()
+            except Exception as e:
+                sys.__stdout__.write(f"Error stopping event-polling-cli: {e}\n")
+                sys.__stdout__.flush()
+        
         # Print captured output summary if desired
         captured_stdout = self.stdout_capture.getvalue()
         captured_stderr = self.stderr_capture.getvalue()
@@ -259,5 +378,14 @@ class Workflow:
         raise NotImplementedError("Amend is not implemented")
 
     def save(self):
-        # TODO: implement this
-        raise NotImplementedError("Save is not implemented")
+        with open("workflow.json", "w") as f:
+            json.dump(self.__dict__, f)
+    
+    def load(path: str) -> 'Workflow':
+        with open(path, "r") as f:
+            data = json.load(f)
+            workflow = Workflow(data['api_key'], data['recording'], data['task_prompt'])
+            if 'code' in data:
+                workflow.code = data['code']
+            return workflow
+            

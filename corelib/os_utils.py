@@ -26,10 +26,15 @@ def _get_mcp_client():
             # In packaged environment, the binary is in the MacOS directory
             server_path = os.path.join(resources_path, "AccessibilityMCPServer")
         else:
-            # In development environment, use the relative path
-            server_path = (
-                "integrations/macos/servers/.build/debug/AccessibilityMCPServer"
-            )
+            # Use the helper to get the correct path
+            try:
+                from integrations.macos import get_accessibility_server_path
+                server_path = str(get_accessibility_server_path())
+            except (ImportError, FileNotFoundError):
+                # Fallback to hardcoded path
+                server_path = (
+                    "integrations/macos/servers/.build/release/AccessibilityMCPServer"
+                )
 
         _mcp_client_instance = PersistentMCPClient(server_path)
         _mcp_client_instance.start()

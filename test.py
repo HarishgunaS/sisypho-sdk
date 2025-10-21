@@ -1,4 +1,4 @@
-from utils import RecorderContext, await_task_completion, Workflow
+from sisypho.utils import RecorderContext, await_task_completion, Workflow
 
 def byo_cua(prompt: str) -> str:
     # TODO: implement your own cua/cua library call here.
@@ -20,4 +20,4 @@ workflow = Workflow(api_key, recording, task_prompt)
 workflow.generate_code()
 result = workflow.run_workflow(fallback_cua=byo_cua)
 
-# workflow.save()
+workflow.save()
