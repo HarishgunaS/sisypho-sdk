@@ -7,8 +7,8 @@ import logging
 from datetime import datetime
 from typing import Optional
 from typing import Callable
-from .execution.recording import record_mode, MCPRecordManager
-from .execution.skill import SkillExecutor
+from sisypho.execution.recording import record_mode, MCPRecordManager
+from sisypho.execution.skill import SkillExecutor
 import requests
 import json
 import subprocess
@@ -30,7 +30,7 @@ def is_port_in_use(port: int, host: str = 'localhost') -> bool:
 def find_event_polling_binary() -> Optional[str]:
     """Find the event-polling-cli binary path."""
     try:
-        from .integrations.macos import get_event_polling_cli_path
+        from sisypho.integrations.macos import get_event_polling_cli_path
         return str(get_event_polling_cli_path())
     except (ImportError, FileNotFoundError) as e:
         return None
@@ -97,7 +97,7 @@ class RecorderContext:
     def __init__(self):
         # Get accessibility server path dynamically
         try:
-            from .integrations.macos import get_accessibility_server_path
+            from sisypho.integrations.macos import get_accessibility_server_path
             accessibility_server = str(get_accessibility_server_path())
         except (ImportError, FileNotFoundError):
             # Fallback to hardcoded path for development
@@ -332,7 +332,7 @@ class Workflow:
     async def generate_code(self):
         """Generate code using the new agentic code generation system"""
         import asyncio
-        from .agentic.generator import generate_automation_code
+        from sisypho.agentic.generator import generate_automation_code
         
         print("Generating skill...")
         

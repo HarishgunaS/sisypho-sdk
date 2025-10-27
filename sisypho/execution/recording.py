@@ -16,7 +16,7 @@ import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from .persistent_mcp_client import PersistentMCPClient, Tool
+from sisypho.execution.persistent_mcp_client import PersistentMCPClient, Tool
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -441,7 +441,7 @@ def main():
         # Default server paths if none provided
         # Get accessibility server path dynamically
         try:
-            from ..integrations.macos import get_accessibility_server_path
+            from sisypho.integrations.macos import get_accessibility_server_path
             accessibility_server = str(get_accessibility_server_path())
         except (ImportError, FileNotFoundError):
             # Fallback to hardcoded path

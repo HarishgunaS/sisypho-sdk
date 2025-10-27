@@ -13,7 +13,7 @@ from pathlib import Path
 def setup_server_permissions():
     """Ensure MCP server binaries have executable permissions."""
     try:
-        from .integrations.macos import get_servers_dir
+        from sisypho.integrations.macos import get_servers_dir
         
         servers_dir = get_servers_dir()
         print(f"Setting up MCP servers in: {servers_dir}")

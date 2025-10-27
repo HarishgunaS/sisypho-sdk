@@ -1,9 +1,9 @@
 import asyncio
 from sisypho.utils import RecorderContext, await_task_completion, Workflow
 
-def byo_cua(prompt: str) -> str:
-    # TODO: implement your own cua/cua library call here.
-    return "some result from executing byo_cua with prompt " + prompt
+# def byo_cua(prompt: str) -> str:
+#     # TODO: implement your own cua/cua library call here.
+#     return "some result from executing byo_cua with prompt " + prompt
 
 async def main():
     task_prompt = "open chrome, open a new tab, and type 'Hello World'"
@@ -18,7 +18,7 @@ async def main():
 
     workflow = Workflow(recording, task_prompt)
     await workflow.generate_code()
-    result = workflow.run_workflow(fallback_cua=byo_cua)
+    result = workflow.run_workflow()
 
     workflow.save()
 

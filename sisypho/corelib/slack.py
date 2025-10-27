@@ -7,7 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from ..execution.persistent_mcp_client import PersistentMCPClient
+from sisypho.execution.persistent_mcp_client import PersistentMCPClient
 
 def _get_slack_mcp_client():
     """Get MCP client for Slack integration."""

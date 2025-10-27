@@ -27,6 +27,7 @@ Requires-Dist: pycryptodomex>=3.23.0
 Requires-Dist: pyotp>=2.0.0
 Requires-Dist: requests>=2.31.0
 Requires-Dist: mcp>=1.0.0
+Requires-Dist: openai>=1.0.0
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0.0; extra == "dev"
 Requires-Dist: black>=23.0.0; extra == "dev"
