@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 _current_active_app = None
 
-from ..execution.persistent_mcp_client import PersistentMCPClient
+from sisypho.execution.persistent_mcp_client import PersistentMCPClient
 
 # Global MCP client instance
 _mcp_client_instance = None
@@ -28,7 +28,7 @@ def _get_mcp_client():
         else:
             # Use the helper to get the correct path
             try:
-                from ..integrations.macos import get_accessibility_server_path
+                from sisypho.integrations.macos import get_accessibility_server_path
                 server_path = str(get_accessibility_server_path())
             except (ImportError, FileNotFoundError):
                 # Fallback to hardcoded path

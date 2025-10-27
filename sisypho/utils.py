@@ -324,38 +324,59 @@ def await_task_completion():
     input()
 
 class Workflow:
-    def __init__(self, api_key: str, recording: str, task_prompt: str):
+    def __init__(self, recording: str, task_prompt: str):
         self.recording = recording
         self.task_prompt = task_prompt
         self.code = ""
-        self.api_key = api_key
 
-    def generate_code(self):
-        # TODO: add api key!!!
-
-        data = {
-            "prompt": f"Create a skill that performs the following task: {self.task_prompt}",
-            "recording": self.recording
-        }
-    
+    async def generate_code(self):
+        """Generate code using the new agentic code generation system"""
+        import asyncio
+        from .agentic.generator import generate_automation_code
+        
         print("Generating skill...")
-        response = requests.post(
-            "http://localhost:8000/api/v1/generate-skill",
-            json=data
-        )
-    
-        print(f"Generate Skill: {response.status_code}")
-        if response.status_code == 200:
-            result = response.json()
-            print(f"Skill Name: {result['skill']['name']}")
-            print(f"Verification Passed: {result['verification_passed']}")
-            if result.get('verification_errors'):
-                print(f"Verification Errors: {result['verification_errors']}")
-            print(f"Code Preview (first 200 chars):\n{result['skill']['code'][:200]}...")
-            self.code = result['skill']['code']
-        else:
-            print(json.dumps(response.json(), indent=2))
+        
+        try:
+            # Prepare recording data if available
+            recording_data = None
+            if self.recording:
+                try:
+                    # Try to parse recording as JSON if it's a string
+                    if isinstance(self.recording, str):
+                        recording_data = json.loads(self.recording)
+                    else:
+                        recording_data = self.recording
+                except (json.JSONDecodeError, TypeError):
+                    # If parsing fails, treat as raw recording text
+                    recording_data = {
+                        "recording_summary": self.recording,
+                        "selector_map": {}
+                    }
+            
+            # Generate code using the new system
+            result = await generate_automation_code(
+                task_prompt=self.task_prompt,
+                recording_data=recording_data,
+                max_attempts=5
+            )
+            
+            if result.success:
+                print(f"✅ Skill Name: {result.skill_name}")
+                print(f"✅ Verification Passed: True")
+                print(f"Code Preview (first 200 chars):\n{result.generated_code[:200]}...")
+                self.code = result.generated_code
+            else:
+                print(f"❌ Generation failed: {result.error_message}")
+                if result.generated_code:
+                    print(f"⚠️  Generated code (may have errors):\n{result.generated_code[:200]}...")
+                    self.code = result.generated_code
+                else:
+                    self.code = ""
+                    
+        except Exception as e:
+            print(f"❌ Error during code generation: {str(e)}")
             self.code = ""
+        
         print()
 
         
@@ -399,7 +420,7 @@ class Workflow:
     def load(path: str) -> 'Workflow':
         with open(path, "r") as f:
             data = json.load(f)
-            workflow = Workflow(data['api_key'], data['recording'], data['task_prompt'])
+            workflow = Workflow(data['recording'], data['task_prompt'])
             if 'code' in data:
                 workflow.code = data['code']
             return workflow

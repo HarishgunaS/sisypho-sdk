@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 # Import corelib modules for skill execution using relative imports
 try:
-    from .. import corelib
+    from sisypho import corelib
     logger.info("Successfully imported corelib modules")
 except ImportError as e:
     logger.error(f"Failed to import corelib modules: {e}")
@@ -121,11 +121,11 @@ class SkillExecutor:
             Dictionary containing the execution namespace
         """
         # Import corelib modules dynamically
-        import corelib.os_utils as corelib_os
-        import corelib.browser as corelib_browser
-        import corelib.llm as corelib_llm
-        import corelib.excel as corelib_excel
-        import corelib.user as corelib_user
+        import sisypho.corelib.os_utils as corelib_os
+        import sisypho.corelib.browser as corelib_browser
+        import sisypho.corelib.llm as corelib_llm
+        import sisypho.corelib.excel as corelib_excel
+        import sisypho.corelib.user as corelib_user
         import inspect as _inspect
         
         # Initialize MCP client if not already done
@@ -176,7 +176,7 @@ class SkillExecutor:
         # This allows using helpers directly (e.g., click, navigate, read_cell, etc.)
         try:
             # Dynamically discover and import all modules from corelib
-            import corelib
+            import sisypho.corelib as corelib
             import pkgutil
             import importlib
             
@@ -187,11 +187,11 @@ class SkillExecutor:
             for importer, modname, ispkg in pkgutil.iter_modules([corelib_path]):
                 try:
                     # Import the module dynamically
-                    module = importlib.import_module(f'corelib.{modname}')
+                    module = importlib.import_module(f'sisypho.corelib.{modname}')
                     corelib_modules.append((module, modname))
-                    logger.debug(f"Successfully imported corelib.{modname}")
+                    logger.debug(f"Successfully imported sisypho.corelib.{modname}")
                 except (ImportError, AttributeError) as e:
-                    logger.warning(f"Could not import corelib.{modname}: {e}")
+                    logger.warning(f"Could not import sisypho.corelib.{modname}: {e}")
             
             # Inject functions from all corelib modules
             for _module, _label in corelib_modules:
@@ -284,10 +284,10 @@ def load_and_execute_skill(skill_file_path: str, parameters: Dict[str, Any] = {}
             
             # Clean up corelib MCP client
             try:
-                import corelib.os_utils
-                if hasattr(corelib.os_utils, '_cleanup_mcp_client'):
+                import sisypho.corelib.os_utils
+                if hasattr(sisypho.corelib.os_utils, '_cleanup_mcp_client'):
                     logger.info("Cleaning up corelib MCP client...")
-                    corelib.os_utils._cleanup_mcp_client()
+                    sisypho.corelib.os_utils._cleanup_mcp_client()
             except Exception as corelib_cleanup_error:
                 logger.warning(f"Error cleaning up corelib MCP client: {corelib_cleanup_error}")
                 
@@ -338,9 +338,9 @@ def main():
         logger.info(f"Received signal {signum}, cleaning up and exiting...")
         try:
             # Clean up corelib MCP client
-            import corelib.os_utils
-            if hasattr(corelib.os_utils, '_cleanup_mcp_client'):
-                corelib.os_utils._cleanup_mcp_client()
+            import sisypho.corelib.os_utils
+            if hasattr(sisypho.corelib.os_utils, '_cleanup_mcp_client'):
+                sisypho.corelib.os_utils._cleanup_mcp_client()
         except Exception as e:
             logger.warning(f"Error during signal cleanup: {e}")
         sys.exit(0)

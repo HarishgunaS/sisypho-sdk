@@ -3,6 +3,7 @@ openpyxl>=3.1.0
 pycryptodomex>=3.23.0
 pyotp>=2.0.0
 requests>=2.31.0
+mcp>=1.0.0
 
 [dev]
 pytest>=7.0.0

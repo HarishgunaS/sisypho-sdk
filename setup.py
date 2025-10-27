@@ -31,19 +31,20 @@ setuptools.setup(
         "Topic :: Software Development :: Testing",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Operating System :: MacOS",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     install_requires=[
         "playwright>=1.40.0",
         "openpyxl>=3.1.0",
         "pycryptodomex>=3.23.0",
         "pyotp>=2.0.0",
         "requests>=2.31.0",
+        "mcp>=1.0.0",
+        "openai>=1.0.0",
     ],
     extras_require={
         "dev": [

@@ -23,11 +23,13 @@ from . import corelib
 from . import execution
 from . import integrations
 from . import utils
+from . import agentic
 
 __all__ = [
     "corelib",
     "execution", 
     "integrations",
     "utils",
+    "agentic",
 ]
 
