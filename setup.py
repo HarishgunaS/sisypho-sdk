@@ -45,6 +45,7 @@ setuptools.setup(
         "requests>=2.31.0",
         "mcp>=1.0.0",
         "openai>=1.0.0",
+        "mypy>=1.0.0",
     ],
     extras_require={
         "dev": [

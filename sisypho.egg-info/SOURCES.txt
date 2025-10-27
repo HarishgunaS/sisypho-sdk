@@ -4,6 +4,9 @@ README.md
 setup.py
 workflow.json
 sisypho/__init__.py
+sisypho/__main__.py
+sisypho/cli.py
+sisypho/commands.py
 sisypho/setup_servers.py
 sisypho/utils.py
 sisypho.egg-info/PKG-INFO
@@ -11,6 +14,9 @@ sisypho.egg-info/SOURCES.txt
 sisypho.egg-info/dependency_links.txt
 sisypho.egg-info/requires.txt
 sisypho.egg-info/top_level.txt
+sisypho/agentic/__init__.py
+sisypho/agentic/generator.py
+sisypho/agentic/tools.py
 sisypho/corelib/__init__.py
 sisypho/corelib/browser.py
 sisypho/corelib/browser_mcp_backup.py

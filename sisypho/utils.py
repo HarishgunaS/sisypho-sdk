@@ -413,15 +413,21 @@ class Workflow:
         # TODO: implement this
         raise NotImplementedError("Amend is not implemented")
 
-    def save(self):
-        with open("workflow.json", "w") as f:
+    def save(self, path: str = "workflow.json"):
+        with open(path, "w") as f:
             json.dump(self.__dict__, f)
     
-    def load(path: str) -> 'Workflow':
+    @classmethod
+    def from_dict(cls, data: dict) -> 'Workflow':
+        """Create a Workflow instance from a dictionary."""
+        workflow = cls(data['recording'], data['task_prompt'])
+        if 'code' in data:
+            workflow.code = data['code']
+        return workflow
+    
+    @classmethod
+    def load(cls, path: str) -> 'Workflow':
         with open(path, "r") as f:
             data = json.load(f)
-            workflow = Workflow(data['recording'], data['task_prompt'])
-            if 'code' in data:
-                workflow.code = data['code']
-            return workflow
+            return cls.from_dict(data)
             
