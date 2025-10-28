@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: sisypho
-Version: 0.1.1
+Version: 0.1.2
 Summary: An SDK for browser automation, workflow recording, and skill execution with MCP integration (macOS only)
 Home-page: https://github.com/HarishgunaS/sisypho-sdk
 Author: Harishguna S
@@ -52,4 +52,382 @@ Dynamic: requires-dist
 Dynamic: requires-python
 Dynamic: summary
 
-# sisypho-sdk
+# Sisypho SDK
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![Platform](https://img.shields.io/badge/platform-macOS-lightgrey.svg)](https://www.apple.com/macos/)
+
+A powerful automation SDK for macOS that enables seamless workflow recording, skill execution, and intelligent task automation through desktop accessibility APIs and browser integration.
+
+## Table of Contents
+
+- [Features](#features)
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [CLI Interface](#cli-interface)
+  - [Desktop Automation](#desktop-automation)
+  - [Browser Automation](#browser-automation)
+  - [Workflow Recording](#workflow-recording)
+  - [Skill Execution](#skill-execution)
+  - [MCP Integration](#mcp-integration)
+- [API Reference](#api-reference)
+- [Chrome Extension](#chrome-extension)
+- [Examples](#examples)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+
+## Features
+
+### 🖥️ **Desktop Automation**
+- Native macOS accessibility API integration
+- System-wide UI element interaction
+- Window management and application control
+- Event recording and playback
+
+### 🌐 **Browser Automation**
+- Playwright integration with user's Chrome installation
+- Seamless access to saved passwords, cache, and browsing history
+- Robust Chrome profile management
+- Cross-browser compatibility
+
+### 📝 **Workflow Recording & Playback**
+- Real-time action recording for both desktop and browser
+- JSON-based workflow serialization
+- Intelligent skill generation from recorded actions
+- Automated workflow optimization
+
+### 🤖 **Agentic AI Integration**
+- MCP (Model Context Protocol) server support
+- LLM-powered task execution
+- Intelligent workflow generation from natural language
+- Adaptive skill execution with error handling
+
+### 🔧 **Developer-Friendly**
+- Clean Python API with type hints
+- Comprehensive CLI interface
+- Modular architecture for easy extension
+- Rich debugging and logging capabilities
+
+## Architecture
+
+Sisypho SDK follows a modular architecture designed for flexibility and extensibility:
+
+```
+sisypho/
+├── corelib/           # Core automation utilities
+│   ├── browser.py     # Playwright browser management
+│   ├── os_utils.py    # macOS system utilities
+│   └── user.py        # User interaction helpers
+├── execution/         # Workflow execution engine
+│   ├── recording.py   # Action recording system
+│   └── skill.py       # Skill execution framework
+├── integrations/      # Platform-specific integrations
+│   ├── macos/         # macOS accessibility servers
+│   ├── chrome/        # Chrome extension bridge
+│   └── windows/       # Windows support (WIP)
+├── agentic/           # AI-powered automation
+│   ├── generator.py   # Workflow generation
+│   └── tools.py       # MCP tools and verification
+└── cli.py             # Command-line interface
+```
+
+## Quick Start
+
+### Prerequisites
+
+- **macOS 11.0+** (required)
+- **Python 3.12+** (required)
+- **Google Chrome** (for browser automation)
+
+### Installation
+
+```bash
+pip install sisypho
+```
+
+For detailed installation instructions and troubleshooting, see [INSTALL.md](INSTALL.md).
+
+### Basic Usage
+
+```python
+import sisypho
+from sisypho.utils import RecorderContext
+
+# Record a workflow
+with RecorderContext() as recorder:
+    print("Recording started... perform your actions")
+    # Your automation actions here
+
+recording = recorder.get_recording()
+print(f"Recorded {len(recording)} events")
+```
+
+## Usage
+
+### CLI Interface
+
+Sisypho provides a comprehensive command-line interface for workflow creation and execution:
+
+#### Create Workflows
+
+```bash
+# Create a workflow from natural language description
+python -m sisypho create --task "open chrome and navigate to github"
+
+# Create with recording enabled
+python -m sisypho create --task "fill out contact form" --record
+
+# Specify output file
+python -m sisypho create --task "download file from website" --output my_workflow.json
+```
+
+#### Execute Workflows
+
+```bash
+# Run a saved workflow
+python -m sisypho run --workflow my_workflow.json
+
+# Run in interactive mode
+python -m sisypho run --interactive
+
+# Override workflow task
+python -m sisypho run --workflow base_workflow.json --task "modified task description"
+```
+
+### Desktop Automation
+
+Desktop automation leverages macOS accessibility APIs for system-wide control:
+
+```python
+from sisypho.corelib import os_utils
+
+# System interaction examples
+os_utils.click_element("button_name")
+os_utils.type_text("Hello, World!")
+os_utils.press_key("return")
+
+# Window management
+os_utils.activate_application("Safari")
+os_utils.get_active_window_info()
+```
+
+### Browser Automation
+
+Browser automation uses Playwright with your existing Chrome installation:
+
+```python
+from sisypho.corelib import browser
+
+# Initialize browser with user profile
+browser.initialize()
+
+# Navigate and interact
+page = browser.get_page()
+page.goto("https://example.com")
+page.click("button[type='submit']")
+page.fill("input[name='email']", "user@example.com")
+
+# Cleanup
+browser.cleanup()
+```
+
+### Workflow Recording
+
+Record user actions for later playback and analysis:
+
+```python
+from sisypho.utils import RecorderContext
+from sisypho.execution.recording import save_recording
+
+with RecorderContext() as recorder:
+    # Perform manual actions - they will be recorded
+    pass
+
+# Save the recording
+recording = recorder.get_recording()
+save_recording(recording, "my_workflow.jsonl")
+```
+
+### Skill Execution
+
+Execute pre-defined or generated skills:
+
+```python
+from sisypho.execution.skill import SkillExecutor
+
+executor = SkillExecutor()
+
+# Load and execute a skill from file
+skill_code = executor.load_skill_from_file("path/to/skill.py")
+result = executor.execute_skill(skill_code)
+
+if result.success:
+    print("Skill executed successfully")
+else:
+    print(f"Execution failed: {result.error}")
+```
+
+### MCP Integration
+
+Integrate with MCP servers for enhanced AI capabilities:
+
+```python
+from sisypho.agentic.tools import server
+from sisypho.agentic.generator import WorkflowGenerator
+
+# Use MCP tools for skill verification
+@server.tool()
+def verify_skill_draft(skill_code: str) -> dict:
+    """Verify a skill draft using mypy type checking."""
+    # Implementation handled by the framework
+    pass
+
+# Generate workflows from natural language
+generator = WorkflowGenerator()
+workflow = generator.generate_from_description("automate daily standup process")
+```
+
+## API Reference
+
+### Core Modules
+
+#### `sisypho.corelib.browser`
+- `initialize()` - Initialize browser with user profile
+- `get_page()` - Get the current browser page
+- `cleanup()` - Clean up browser resources
+
+#### `sisypho.corelib.os_utils`
+- `click_element(element_name)` - Click UI element by name
+- `type_text(text)` - Type text at current cursor position
+- `press_key(key)` - Press keyboard key
+- `activate_application(app_name)` - Bring application to foreground
+
+#### `sisypho.execution.skill`
+- `SkillExecutor` - Main class for skill execution
+- `load_skill_from_file(path)` - Load skill from Python file
+- `execute_skill(code)` - Execute skill code
+
+#### `sisypho.utils`
+- `RecorderContext` - Context manager for recording actions
+
+## Chrome Extension
+
+Install the Sisypho Chrome Extension to enable browser action recording:
+
+**[Install from Chrome Web Store](https://chromewebstore.google.com/detail/sisypho-chrome-ext/bllfdccnpfjfdofbepfncfdhbjjcjfcm?utm_source=item-share-cb&pli=1)**
+
+The extension enables:
+- Real-time browser action recording
+- Seamless integration with Sisypho workflows
+- Visual feedback during recording sessions
+- Automatic workflow generation from browser interactions
+
+## Examples
+
+### Example 1: Automated Web Form Filling
+
+```python
+from sisypho.corelib import browser
+from sisypho.utils import RecorderContext
+
+with RecorderContext() as recorder:
+    browser.initialize()
+    page = browser.get_page()
+    
+    # Navigate to form
+    page.goto("https://example.com/contact")
+    
+    # Fill form fields
+    page.fill("#name", "John Doe")
+    page.fill("#email", "john@example.com")
+    page.fill("#message", "Hello from Sisypho!")
+    
+    # Submit
+    page.click("button[type='submit']")
+    
+    browser.cleanup()
+
+# Save the recorded workflow
+recording = recorder.get_recording()
+print(f"Recorded {len(recording)} actions")
+```
+
+### Example 2: Desktop Application Automation
+
+```python
+from sisypho.corelib import os_utils
+from sisypho.utils import RecorderContext
+
+with RecorderContext() as recorder:
+    # Open application
+    os_utils.activate_application("TextEdit")
+    
+    # Create new document
+    os_utils.press_key("cmd+n")
+    
+    # Type content
+    os_utils.type_text("Automated document creation with Sisypho!")
+    
+    # Save document
+    os_utils.press_key("cmd+s")
+    os_utils.type_text("automated_document.txt")
+    os_utils.press_key("return")
+```
+
+### Example 3: Skill Generation and Execution
+
+```python
+from sisypho.agentic.generator import WorkflowGenerator
+from sisypho.execution.skill import SkillExecutor
+
+# Generate skill from description
+generator = WorkflowGenerator()
+skill = generator.generate_from_description(
+    "Open Safari, navigate to GitHub, and search for 'sisypho'"
+)
+
+# Execute the generated skill
+executor = SkillExecutor()
+result = executor.execute_skill(skill.code)
+
+if result.success:
+    print("Skill executed successfully!")
+else:
+    print(f"Execution failed: {result.error}")
+```
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+### Development Setup
+
+1. Clone the repository
+2. Install development dependencies: `pip install -e .[dev]`
+3. Build platform servers: `python -m sisypho.setup_servers`
+4. Run tests: `pytest`
+
+### Platform Support
+
+- **macOS**: Full support (primary platform)
+- **Windows**: Work in progress
+- **Linux**: Not currently supported
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+- **Primary**: satgu7[at]gmail[dot]com
+- **Secondary**: saumik[dot]13[at]gmail.com
+
+For bug reports and feature requests, please use the [GitHub Issues](https://github.com/HarishgunaS/sisypho-sdk/issues) page.
+
+---
+
+**Sisypho SDK** - Empowering intelligent automation for the modern workplace.

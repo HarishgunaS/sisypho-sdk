@@ -10,7 +10,7 @@ import asyncio
 import sys
 from typing import Optional
 
-from .commands import create_command, run_command
+from .commands import create_command, run_command, mcp_command
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -25,6 +25,7 @@ Examples:
   python -m sisypho create --task "open chrome and type hello" --record
   python -m sisypho run --workflow workflow.json
   python -m sisypho run --interactive
+  python -m sisypho mcp --workflow-directory ./workflows
         """
     )
     
@@ -84,6 +85,19 @@ Examples:
         help="Task description to execute (overrides workflow task)"
     )
     
+    # MCP command
+    mcp_parser = subparsers.add_parser(
+        "mcp",
+        help="Launch MCP server"
+    )
+    mcp_parser.add_argument(
+        "--workflow-directory",
+        "-w",
+        type=str,
+        default=".",
+        help="Directory to load workflows from (default: current directory)"
+    )
+    
     return parser
 
 
@@ -97,6 +111,8 @@ async def main() -> None:
             await create_command(args)
         elif args.command == "run":
             await run_command(args)
+        elif args.command == "mcp":
+            await mcp_command(args)
         else:
             parser.print_help()
             sys.exit(1)

@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Optional
 
 from .utils import RecorderContext, await_task_completion, Workflow
+from .mcp_server import run_server
 
 
 async def create_command(args: argparse.Namespace) -> None:
@@ -156,3 +157,26 @@ async def run_test_workflow() -> None:
 
     workflow.save()
     print("✅ Test workflow completed and saved")
+
+
+async def mcp_command(args: argparse.Namespace) -> None:
+    """Launch MCP server."""
+    import sys
+    import logging
+    
+    # Set up logging to stderr to avoid interfering with MCP protocol
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        stream=sys.stderr
+    )
+    
+    try:
+        await run_server(workflow_directory=args.workflow_directory)
+    except KeyboardInterrupt:
+        # Log to stderr instead of stdout
+        logging.info("MCP server stopped by user")
+    except Exception as e:
+        # Log to stderr instead of stdout
+        logging.error(f"Error running MCP server: {e}")
+        raise
