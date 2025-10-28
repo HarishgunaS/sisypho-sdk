@@ -4,7 +4,7 @@ Version: 0.1.0
 Summary: An SDK for browser automation, workflow recording, and skill execution with MCP integration (macOS only)
 Home-page: https://github.com/HarishgunaS/sisypho-sdk
 Author: Harishguna S
-Author-email: your.email@example.com
+Author-email: satgu7@gmail.com
 Project-URL: Bug Reports, https://github.com/HarishgunaS/sisypho-sdk/issues
 Project-URL: Source, https://github.com/HarishgunaS/sisypho-sdk
 Keywords: automation,browser,workflow,recording,MCP,skills,playwright

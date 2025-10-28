@@ -14,7 +14,7 @@ setuptools.setup(
     name="sisypho",
     version="0.1.0",
     author="Harishguna S",
-    author_email="your.email@example.com",  # Update this with your actual email
+    author_email="satgu7@gmail.com",  # Update this with your actual email
     description="An SDK for browser automation, workflow recording, and skill execution with MCP integration (macOS only)",
     long_description=long_description,
     long_description_content_type="text/markdown",

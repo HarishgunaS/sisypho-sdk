@@ -339,8 +339,6 @@ func generateDescriptivePath(to endElement: AXUIElement, from startElement: AXUI
         }
     }
 
-    pathComponents = pathComponents.filter { $0.type != "AXGroup" }
-
     return pathComponents.map { $0.toString() }.joined(separator: " > ")
 }
 
@@ -907,8 +905,8 @@ final class EventPollingMonitor: @unchecked Sendable {
         let eventMask =
             (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue)
             | (1 << CGEventType.flagsChanged.rawValue) | (1 << CGEventType.leftMouseDown.rawValue)
-            | (1 << CGEventType.leftMouseUp.rawValue) | (1 << CGEventType.rightMouseDown.rawValue)
-            | (1 << CGEventType.rightMouseUp.rawValue) | (1 << CGEventType.scrollWheel.rawValue)
+            | (0 << CGEventType.leftMouseUp.rawValue) | (1 << CGEventType.rightMouseDown.rawValue)
+            | (0 << CGEventType.rightMouseUp.rawValue) | (1 << CGEventType.scrollWheel.rawValue)
 
         // Create the event tap callback
         let callback: CGEventTapCallBack = { (proxy, type, event, refcon) -> Unmanaged<CGEvent>? in
