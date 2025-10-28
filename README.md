@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Platform](https://img.shields.io/badge/platform-macOS-lightgrey.svg)](https://www.apple.com/macos/)
 
-A powerful automation SDK for macOS that enables seamless workflow recording, skill execution, and intelligent task automation through desktop accessibility APIs and browser integration.
+A powerful automation SDK for macOS that enables seamless workflow recording, skill execution, and intelligent task automation through desktop accessibility APIs and browser integration. Now includes MCP (Model Context Protocol) server support to create custom UI-based tools for computer use agents.
 
 ## Table of Contents
 
@@ -47,9 +47,10 @@ A powerful automation SDK for macOS that enables seamless workflow recording, sk
 - Automated workflow optimization
 
 ### 🤖 **Agentic AI Integration**
-- MCP (Model Context Protocol) server support
-- LLM-powered task execution
-- Intelligent workflow generation from natural language
+- Built-in MCP (Model Context Protocol) server for computer use agents
+- Automatic workflow-to-tool conversion for AI integration
+- Custom UI automation tools accessible via MCP protocol
+- LLM-powered task execution and workflow generation
 - Adaptive skill execution with error handling
 
 ### 🔧 **Developer-Friendly**
@@ -78,6 +79,7 @@ sisypho/
 ├── agentic/           # AI-powered automation
 │   ├── generator.py   # Workflow generation
 │   └── tools.py       # MCP tools and verification
+├── mcp_server.py      # MCP server for computer use agents
 └── cli.py             # Command-line interface
 ```
 
@@ -151,6 +153,19 @@ python -m sisypho run --interactive
 
 # Override workflow task
 python -m sisypho run --workflow workflow.json --task "modified task description"
+```
+
+#### Launch MCP Server
+
+```bash
+# Launch MCP server with workflows from current directory
+python -m sisypho mcp
+
+# Launch MCP server with workflows from specific directory
+python -m sisypho mcp --workflow-directory ./my-workflows
+
+# Use with computer use agents that support MCP protocol
+python -m sisypho mcp --workflow-directory ./automation-tools
 ```
 
 ### Desktop Automation
@@ -280,6 +295,104 @@ async def mcp_integration_example():
 
 asyncio.run(mcp_integration_example())
 ```
+
+#### MCP Server Setup and Usage
+
+Launch Sisypho as an MCP server to expose your workflows as tools for computer use agents:
+
+```bash
+# Start the MCP server
+python -m sisypho mcp --workflow-directory ./workflows
+```
+
+Connect from your computer use agent or MCP client:
+
+```python
+# Example MCP client configuration
+from mcp.client import Client
+
+async def use_sisypho_tools():
+    # Connect to Sisypho MCP server
+    client = Client()
+    await client.connect("stdio", command=["python", "-m", "sisypho", "mcp"])
+    
+    # List available workflow tools
+    tools = await client.list_tools()
+    print(f"Available automation tools: {[tool.name for tool in tools]}")
+    
+    # Execute a workflow tool
+    result = await client.call_tool("run_workflow_0", {})
+    print(f"Workflow result: {result}")
+```
+
+Each workflow in your directory becomes an executable tool that computer use agents can call to perform UI automation tasks.
+
+## Custom UI Tools for Computer Use Agents
+
+Sisypho SDK enables you to create reusable UI automation tools that computer use agents can leverage through the MCP protocol. Here's how workflows become powerful automation tools:
+
+### Workflow-to-Tool Conversion
+
+When you launch the MCP server, Sisypho automatically:
+
+1. **Scans** your workflow directory for `.json` workflow files
+2. **Registers** each workflow as an MCP tool with its task description
+3. **Exposes** the tools via the MCP protocol for agent consumption
+
+```bash
+# Directory structure
+./automation-tools/
+├── gmail_automation.json     # Becomes "run_workflow_0" tool
+├── slack_notifications.json  # Becomes "run_workflow_1" tool
+└── data_entry.json          # Becomes "run_workflow_2" tool
+
+# Launch MCP server
+python -m sisypho mcp --workflow-directory ./automation-tools
+```
+
+### Agent Integration Examples
+
+Computer use agents can now call your custom UI tools:
+
+```python
+# Agent discovers available tools
+tools = await mcp_client.list_tools()
+# Returns: [
+#   {"name": "run_workflow_0", "description": "Automate Gmail inbox management"},
+#   {"name": "run_workflow_1", "description": "Send Slack status updates"},
+#   {"name": "run_workflow_2", "description": "Fill customer data forms"}
+# ]
+
+# Agent executes UI automation
+result = await mcp_client.call_tool("run_workflow_0", {})
+# Sisypho performs the recorded Gmail automation workflow
+```
+
+### Building Tool Libraries
+
+Create specialized tool libraries for different use cases:
+
+```bash
+# Business productivity tools
+./business-tools/
+├── calendar_management.json
+├── email_templates.json
+└── report_generation.json
+
+# Development workflow tools  
+./dev-tools/
+├── github_pr_workflow.json
+├── deployment_checks.json
+└── code_review_automation.json
+
+# Customer service tools
+./support-tools/
+├── ticket_routing.json
+├── customer_onboarding.json
+└── feedback_collection.json
+```
+
+Each directory becomes a specialized MCP server providing domain-specific UI automation capabilities to computer use agents.
 
 ## API Reference
 
