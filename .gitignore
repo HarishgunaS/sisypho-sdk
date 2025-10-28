@@ -14,3 +14,4 @@ dist/*.pyz
 dist/*.pywz
 *.pyc
 workflow*.json
+*.jsonl
