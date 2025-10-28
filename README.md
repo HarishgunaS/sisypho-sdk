@@ -100,16 +100,25 @@ For detailed installation instructions and troubleshooting, see [INSTALL.md](INS
 ### Basic Usage
 
 ```python
-import sisypho
-from sisypho.utils import RecorderContext
+import asyncio
+from sisypho.utils import RecorderContext, await_task_completion, Workflow
 
-# Record a workflow
-with RecorderContext() as recorder:
-    print("Recording started... perform your actions")
-    # Your automation actions here
+async def main():
+    task_prompt = "Open Chrome and navigate to GitHub"
+    
+    # Record a workflow
+    with RecorderContext() as recorder:
+        await_task_completion()
+    
+    recording = recorder.get_recording()
+    workflow = Workflow(recording, task_prompt)
+    
+    await workflow.generate_code()
+    result = workflow.run_workflow()
+    workflow.save()
 
-recording = recorder.get_recording()
-print(f"Recorded {len(recording)} events")
+# Run the async function
+asyncio.run(main())
 ```
 
 ## Usage
@@ -122,63 +131,76 @@ Sisypho provides a comprehensive command-line interface for workflow creation an
 
 ```bash
 # Create a workflow from natural language description
-python -m sisypho create --task "open chrome and navigate to github"
+python -m sisypho create --task "open chrome and type hello"
 
 # Create with recording enabled
-python -m sisypho create --task "fill out contact form" --record
+python -m sisypho create --task "open chrome and type hello" --record
 
 # Specify output file
-python -m sisypho create --task "download file from website" --output my_workflow.json
+python -m sisypho create --task "download file from website" --output workflow.json
 ```
 
 #### Execute Workflows
 
 ```bash
 # Run a saved workflow
-python -m sisypho run --workflow my_workflow.json
+python -m sisypho run --workflow workflow.json
 
 # Run in interactive mode
 python -m sisypho run --interactive
 
 # Override workflow task
-python -m sisypho run --workflow base_workflow.json --task "modified task description"
+python -m sisypho run --workflow workflow.json --task "modified task description"
 ```
 
 ### Desktop Automation
 
-Desktop automation leverages macOS accessibility APIs for system-wide control:
+Desktop automation leverages macOS accessibility APIs through natural language workflows:
 
 ```python
-from sisypho.corelib import os_utils
+import asyncio
+from sisypho.utils import RecorderContext, await_task_completion, Workflow
 
-# System interaction examples
-os_utils.click_element("button_name")
-os_utils.type_text("Hello, World!")
-os_utils.press_key("return")
+async def desktop_automation_example():
+    task_prompt = "Open TextEdit, create a new document, and type 'Hello, World!'"
+    
+    # Record the desktop actions
+    with RecorderContext() as recorder:
+        await_task_completion()
+    
+    recording = recorder.get_recording()
+    workflow = Workflow(recording, task_prompt)
+    
+    await workflow.generate_code()
+    result = workflow.run_workflow()
+    workflow.save("desktop_automation.json")
 
-# Window management
-os_utils.activate_application("Safari")
-os_utils.get_active_window_info()
+asyncio.run(desktop_automation_example())
 ```
 
 ### Browser Automation
 
-Browser automation uses Playwright with your existing Chrome installation:
+Browser automation uses Playwright with your existing Chrome installation through workflow recording:
 
 ```python
-from sisypho.corelib import browser
+import asyncio
+from sisypho.utils import RecorderContext, await_task_completion, Workflow
 
-# Initialize browser with user profile
-browser.initialize()
+async def browser_automation_example():
+    task_prompt = "Open Chrome, navigate to GitHub, and search for 'sisypho'"
+    
+    # Record the browser actions
+    with RecorderContext() as recorder:
+        await_task_completion()
+    
+    recording = recorder.get_recording()
+    workflow = Workflow(recording, task_prompt)
+    
+    await workflow.generate_code()
+    result = workflow.run_workflow()
+    workflow.save("browser_automation.json")
 
-# Navigate and interact
-page = browser.get_page()
-page.goto("https://example.com")
-page.click("button[type='submit']")
-page.fill("input[name='email']", "user@example.com")
-
-# Cleanup
-browser.cleanup()
+asyncio.run(browser_automation_example())
 ```
 
 ### Workflow Recording
@@ -186,16 +208,22 @@ browser.cleanup()
 Record user actions for later playback and analysis:
 
 ```python
-from sisypho.utils import RecorderContext
-from sisypho.execution.recording import save_recording
+import asyncio
+from sisypho.utils import RecorderContext, await_task_completion, Workflow
 
-with RecorderContext() as recorder:
-    # Perform manual actions - they will be recorded
-    pass
+async def recording_example():
+    task_prompt = "Record actions for email automation"
+    
+    with RecorderContext() as recorder:
+        # Perform manual actions - they will be recorded
+        await_task_completion()
+    
+    # Save the recording
+    recording = recorder.get_recording()
+    workflow = Workflow(recording, task_prompt)
+    workflow.save("my_workflow.json")
 
-# Save the recording
-recording = recorder.get_recording()
-save_recording(recording, "my_workflow.jsonl")
+asyncio.run(recording_example())
 ```
 
 ### Skill Execution
@@ -203,18 +231,27 @@ save_recording(recording, "my_workflow.jsonl")
 Execute pre-defined or generated skills:
 
 ```python
+import asyncio
 from sisypho.execution.skill import SkillExecutor
+from sisypho.utils import Workflow
 
-executor = SkillExecutor()
+async def skill_execution_example():
+    executor = SkillExecutor()
+    
+    # Load and execute a skill from file
+    skill_code = executor.load_skill_from_file("path/to/skill.py")
+    
+    try:
+        executor.execute_skill_code(skill_code)
+        print("Skill executed successfully")
+    except Exception as e:
+        print(f"Execution failed: {e}")
 
-# Load and execute a skill from file
-skill_code = executor.load_skill_from_file("path/to/skill.py")
-result = executor.execute_skill(skill_code)
+    # Or run a complete workflow
+    workflow = Workflow.load("my_workflow.json")
+    result = workflow.run_workflow()
 
-if result.success:
-    print("Skill executed successfully")
-else:
-    print(f"Execution failed: {result.error}")
+asyncio.run(skill_execution_example())
 ```
 
 ### MCP Integration
@@ -222,43 +259,57 @@ else:
 Integrate with MCP servers for enhanced AI capabilities:
 
 ```python
-from sisypho.agentic.tools import server
-from sisypho.agentic.generator import WorkflowGenerator
+import asyncio
+from sisypho.utils import RecorderContext, await_task_completion, Workflow
 
-# Use MCP tools for skill verification
-@server.tool()
-def verify_skill_draft(skill_code: str) -> dict:
-    """Verify a skill draft using mypy type checking."""
-    # Implementation handled by the framework
-    pass
+async def mcp_integration_example():
+    # Use natural language to describe complex workflows
+    task_prompt = """Open Excel from Downloads, calculate total sales column, 
+    and paste the result into a new Apple Notes entry."""
+    
+    with RecorderContext() as recorder:
+        await_task_completion()
+    
+    recording = recorder.get_recording()
+    workflow = Workflow(recording, task_prompt)
+    
+    # Generate optimized code using MCP servers
+    await workflow.generate_code()
+    result = workflow.run_workflow()
+    workflow.save("mcp_workflow.json")
 
-# Generate workflows from natural language
-generator = WorkflowGenerator()
-workflow = generator.generate_from_description("automate daily standup process")
+asyncio.run(mcp_integration_example())
 ```
 
 ## API Reference
 
 ### Core Modules
 
-#### `sisypho.corelib.browser`
-- `initialize()` - Initialize browser with user profile
-- `get_page()` - Get the current browser page
-- `cleanup()` - Clean up browser resources
-
-#### `sisypho.corelib.os_utils`
-- `click_element(element_name)` - Click UI element by name
-- `type_text(text)` - Type text at current cursor position
-- `press_key(key)` - Press keyboard key
-- `activate_application(app_name)` - Bring application to foreground
+#### `sisypho.utils`
+- `RecorderContext` - Context manager for recording actions
+- `await_task_completion()` - Wait for user to complete manual actions during recording
+- `Workflow(recording, task_prompt)` - Main workflow orchestrator
+  - `generate_code()` - Generate automation code from recording and prompt
+  - `run_workflow()` - Execute the generated workflow
+  - `save(path)` - Save workflow to file
+  - `load(path)` - Load workflow from file
 
 #### `sisypho.execution.skill`
 - `SkillExecutor` - Main class for skill execution
-- `load_skill_from_file(path)` - Load skill from Python file
-- `execute_skill(code)` - Execute skill code
+  - `load_skill_from_file(path)` - Load skill from Python file
+  - `execute_skill_code(code)` - Execute skill code directly
 
-#### `sisypho.utils`
-- `RecorderContext` - Context manager for recording actions
+#### `sisypho.corelib.browser`
+- `navigate(url)` - Navigate to a URL
+- `click_element(selector)` - Click element by CSS selector
+- `type_text(selector, text)` - Type text into form field
+- `getContent(rootNode)` - Extract content from page
+
+#### `sisypho.corelib.os_utils`
+- `click(app_name, element_descriptor, is_right_click, is_double_click, duration)` - Click UI element
+- `type(app_name, text)` - Type text in application
+- `command(app_name, element_descriptor, modifier_keys, key)` - Press keyboard command
+- `open_app(app_name)` - Open application on macOS
 
 ## Chrome Extension
 
@@ -277,73 +328,74 @@ The extension enables:
 ### Example 1: Automated Web Form Filling
 
 ```python
-from sisypho.corelib import browser
-from sisypho.utils import RecorderContext
+import asyncio
+from sisypho.utils import RecorderContext, await_task_completion, Workflow
 
-with RecorderContext() as recorder:
-    browser.initialize()
-    page = browser.get_page()
+async def web_form_automation():
+    task_prompt = """Navigate to example.com contact form, 
+    fill in name as 'John Doe', email as 'john@example.com', 
+    message as 'Hello from Sisypho!', and submit the form."""
     
-    # Navigate to form
-    page.goto("https://example.com/contact")
+    with RecorderContext() as recorder:
+        await_task_completion()
     
-    # Fill form fields
-    page.fill("#name", "John Doe")
-    page.fill("#email", "john@example.com")
-    page.fill("#message", "Hello from Sisypho!")
+    recording = recorder.get_recording()
+    workflow = Workflow(recording, task_prompt)
     
-    # Submit
-    page.click("button[type='submit']")
-    
-    browser.cleanup()
+    await workflow.generate_code()
+    result = workflow.run_workflow()
+    workflow.save("web_form_automation.json")
 
-# Save the recorded workflow
-recording = recorder.get_recording()
-print(f"Recorded {len(recording)} actions")
+asyncio.run(web_form_automation())
 ```
 
 ### Example 2: Desktop Application Automation
 
 ```python
-from sisypho.corelib import os_utils
-from sisypho.utils import RecorderContext
+import asyncio
+from sisypho.utils import RecorderContext, await_task_completion, Workflow
 
-with RecorderContext() as recorder:
-    # Open application
-    os_utils.activate_application("TextEdit")
+async def desktop_app_automation():
+    task_prompt = """Open TextEdit, create a new document, 
+    type 'Automated document creation with Sisypho!', 
+    save the document as 'automated_document.txt'."""
     
-    # Create new document
-    os_utils.press_key("cmd+n")
+    with RecorderContext() as recorder:
+        await_task_completion()
     
-    # Type content
-    os_utils.type_text("Automated document creation with Sisypho!")
+    recording = recorder.get_recording()
+    workflow = Workflow(recording, task_prompt)
     
-    # Save document
-    os_utils.press_key("cmd+s")
-    os_utils.type_text("automated_document.txt")
-    os_utils.press_key("return")
+    await workflow.generate_code()
+    result = workflow.run_workflow()
+    workflow.save("desktop_automation.json")
+
+asyncio.run(desktop_app_automation())
 ```
 
-### Example 3: Skill Generation and Execution
+### Example 3: Complex Multi-App Workflow
 
 ```python
-from sisypho.agentic.generator import WorkflowGenerator
-from sisypho.execution.skill import SkillExecutor
+import asyncio
+from sisypho.utils import RecorderContext, await_task_completion, Workflow
 
-# Generate skill from description
-generator = WorkflowGenerator()
-skill = generator.generate_from_description(
-    "Open Safari, navigate to GitHub, and search for 'sisypho'"
-)
+async def multi_app_workflow():
+    task_prompt = """Open Excel from Downloads, calculate the total sales column, 
+    and paste the result into a new Apple Notes entry."""
+    
+    with RecorderContext() as recorder:
+        await_task_completion()
+    
+    recording = recorder.get_recording()
+    workflow = Workflow(recording, task_prompt)
+    
+    await workflow.generate_code()
+    result = workflow.run_workflow()
+    workflow.save("multi_app_workflow.json")
+    
+    print("Multi-app workflow executed successfully!")
 
-# Execute the generated skill
-executor = SkillExecutor()
-result = executor.execute_skill(skill.code)
-
-if result.success:
-    print("Skill executed successfully!")
-else:
-    print(f"Execution failed: {result.error}")
+asyncio.run(multi_app_workflow())
 ```
 
 ## Contributing
