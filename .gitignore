@@ -13,3 +13,4 @@ dist/*.pyw
 dist/*.pyz
 dist/*.pywz
 *.pyc
+workflow*.json
