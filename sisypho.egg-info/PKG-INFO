@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: sisypho
-Version: 0.1.0
+Version: 0.1.1
 Summary: An SDK for browser automation, workflow recording, and skill execution with MCP integration (macOS only)
 Home-page: https://github.com/HarishgunaS/sisypho-sdk
 Author: Harishguna S

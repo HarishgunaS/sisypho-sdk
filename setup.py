@@ -12,7 +12,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="sisypho",
-    version="0.1.0",
+    version="0.1.1",
     author="Harishguna S",
     author_email="satgu7@gmail.com",  # Update this with your actual email
     description="An SDK for browser automation, workflow recording, and skill execution with MCP integration (macOS only)",
@@ -66,3 +66,4 @@ setuptools.setup(
         "Source": "https://github.com/HarishgunaS/sisypho-sdk",
     },
 )
+
