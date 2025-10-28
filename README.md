@@ -504,6 +504,3 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 For bug reports and feature requests, please use the [GitHub Issues](https://github.com/HarishgunaS/sisypho-sdk/issues) page.
 
----
-
-**Sisypho SDK** - Empowering intelligent automation for the modern workplace.
