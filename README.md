@@ -28,32 +28,31 @@ A powerful automation SDK for macOS that enables seamless workflow recording, sk
 
 ## Features
 
-### 🖥️ **Desktop Automation**
+### **Desktop Automation**
 - Native macOS accessibility API integration
 - System-wide UI element interaction
 - Window management and application control
 - Event recording and playback
 
-### 🌐 **Browser Automation**
+### **Browser Automation**
 - Playwright integration with user's Chrome installation
-- Seamless access to saved passwords, cache, and browsing history
 - Robust Chrome profile management
 - Cross-browser compatibility
 
-### 📝 **Workflow Recording & Playback**
+### **Workflow Recording & Playback**
 - Real-time action recording for both desktop and browser
 - JSON-based workflow serialization
 - Intelligent skill generation from recorded actions
 - Automated workflow optimization
 
-### 🤖 **Agentic AI Integration**
+### **Agentic AI Integration**
 - Built-in MCP (Model Context Protocol) server for computer use agents
 - Automatic workflow-to-tool conversion for AI integration
 - Custom UI automation tools accessible via MCP protocol
 - LLM-powered task execution and workflow generation
-- Adaptive skill execution with error handling
+- Adaptive skill execution with error handling (WIP)
 
-### 🔧 **Developer-Friendly**
+### **Developer-Friendly**
 - Clean Python API with type hints
 - Comprehensive CLI interface
 - Modular architecture for easy extension
@@ -88,7 +87,7 @@ sisypho/
 ### Prerequisites
 
 - **macOS 11.0+** (required)
-- **Python 3.12+** (required)
+- **Python 3.10+** (required)
 - **Google Chrome** (for browser automation)
 
 ### Installation
@@ -150,9 +149,6 @@ python -m sisypho run --workflow workflow.json
 
 # Run in interactive mode
 python -m sisypho run --interactive
-
-# Override workflow task
-python -m sisypho run --workflow workflow.json --task "modified task description"
 ```
 
 #### Launch MCP Server
@@ -163,9 +159,6 @@ python -m sisypho mcp
 
 # Launch MCP server with workflows from specific directory
 python -m sisypho mcp --workflow-directory ./my-workflows
-
-# Use with computer use agents that support MCP protocol
-python -m sisypho mcp --workflow-directory ./automation-tools
 ```
 
 ### Desktop Automation
@@ -239,34 +232,6 @@ async def recording_example():
     workflow.save("my_workflow.json")
 
 asyncio.run(recording_example())
-```
-
-### Skill Execution
-
-Execute pre-defined or generated skills:
-
-```python
-import asyncio
-from sisypho.execution.skill import SkillExecutor
-from sisypho.utils import Workflow
-
-async def skill_execution_example():
-    executor = SkillExecutor()
-    
-    # Load and execute a skill from file
-    skill_code = executor.load_skill_from_file("path/to/skill.py")
-    
-    try:
-        executor.execute_skill_code(skill_code)
-        print("Skill executed successfully")
-    except Exception as e:
-        print(f"Execution failed: {e}")
-
-    # Or run a complete workflow
-    workflow = Workflow.load("my_workflow.json")
-    result = workflow.run_workflow()
-
-asyncio.run(skill_execution_example())
 ```
 
 ### MCP Integration
